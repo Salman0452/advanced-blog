@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Unapproved Comments - Advanced Blog{% endblock %}
+
+{% block content %}
+<h1 class="mb-4"><i class="bi bi-shield-exclamation"></i> Unapproved Comments</h1>
+
+{% if comments %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> {{ comments|length }} comment{{ comments|pluralize }} pending approval
+    </div>
+
+    {% for comment in comments %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h5 class="mb-1">
+                            <a href="{% url 'blog:post_detail' comment.post.slug %}">{{ comment.post.title }}</a>
+                        </h5>
+                        <small class="text-muted">
+                            <i class="bi bi-person"></i> {{ comment.author.get_full_name|default:comment.author.username }}
+                            <i class="bi bi-calendar ms-2"></i> {{ comment.created_at|date:"M d, Y H:i" }}
+                        </small>
+                    </div>
+                    <div class="btn-group">
+                        <a href="{% url 'blog:comment_moderate' comment.pk %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-shield-check"></i> Moderate
+                        </a>
+                        <a href="{% url 'blog:comment_delete' comment.pk %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+                <p class="mb-0">{{ comment.content }}</p>
+            </div>
+        </div>
+    {% endfor %}
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i> All comments are approved! No pending moderation.
+    </div>
+{% endif %}
+{% endblock %}

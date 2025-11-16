@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ form_title }} - Advanced Blog{% endblock %}
+
+{% block extra_css %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="bi bi-pencil-square"></i> {{ form_title }}</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">Title *</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-danger">{{ form.title.errors }}</div>
+                        {% endif %}
+                        {% if form.title.help_text %}
+                            <small class="text-muted">{{ form.title.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">Content *</label>
+                        {{ form.content }}
+                        {% if form.content.errors %}
+                            <div class="text-danger">{{ form.content.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.excerpt.id_for_label }}" class="form-label">Excerpt</label>
+                        {{ form.excerpt }}
+                        {% if form.excerpt.errors %}
+                            <div class="text-danger">{{ form.excerpt.errors }}</div>
+                        {% endif %}
+                        {% if form.excerpt.help_text %}
+                            <small class="text-muted">{{ form.excerpt.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger">{{ form.category.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status *</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                                <div class="text-danger">{{ form.status.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tags</label>
+                        <div class="border rounded p-3">
+                            {{ form.tags }}
+                        </div>
+                        {% if form.tags.errors %}
+                            <div class="text-danger">{{ form.tags.errors }}</div>
+                        {% endif %}
+                        {% if form.tags.help_text %}
+                            <small class="text-muted">{{ form.tags.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.featured_image.id_for_label }}" class="form-label">Featured Image</label>
+                        {{ form.featured_image }}
+                        {% if form.featured_image.errors %}
+                            <div class="text-danger">{{ form.featured_image.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> {{ submit_text }}
+                        </button>
+                        <a href="{% url 'blog:my_posts' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ form.media.js }}
+{% endblock %}

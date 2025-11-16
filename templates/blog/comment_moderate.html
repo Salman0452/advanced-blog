@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Moderate Comment - Advanced Blog{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="bi bi-shield-check"></i> Moderate Comment</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5>Post: {{ object.post.title }}</h5>
+                    <p class="text-muted">
+                        <i class="bi bi-person"></i> {{ object.author.get_full_name|default:object.author.username }}
+                        <i class="bi bi-calendar ms-2"></i> {{ object.created_at|date:"M d, Y H:i" }}
+                    </p>
+                    <blockquote class="border-start border-3 ps-3">
+                        {{ object.content }}
+                    </blockquote>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-check mb-3">
+                        {{ form.is_approved }}
+                        <label class="form-check-label" for="{{ form.is_approved.id_for_label }}">
+                            Approve this comment
+                        </label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Update Status
+                        </button>
+                        <a href="{% url 'blog:post_detail' object.post.slug %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Post
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

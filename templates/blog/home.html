@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Advanced Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Welcome Section -->
+        <div class="card mb-4">
+            <div class="card-body p-5">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-journal-text text-primary"></i> Welcome to Advanced Blog
+                </h1>
+                {% if user.is_authenticated %}
+                    <p class="lead">
+                        Hello, <strong>{{ user.get_full_name|default:user.username }}</strong>! 
+                        You are logged in as a <span class="user-badge badge-{{ user.role|lower }}">{{ user.role }}</span>.
+                    </p>
+                    <hr class="my-4">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <i class="bi bi-person-circle text-primary" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2 mb-0">Your Role</h6>
+                                <p class="mb-0"><strong>{{ user.role }}</strong></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <i class="bi bi-calendar-check text-success" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2 mb-0">Member Since</h6>
+                                <p class="mb-0"><strong>{{ user.date_joined|date:"M Y" }}</strong></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <i class="bi bi-envelope text-info" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2 mb-0">Email</h6>
+                                <p class="mb-0 small"><strong>{{ user.email }}</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="lead">
+                        A feature-rich blogging platform with role-based access control.
+                    </p>
+                    <hr class="my-4">
+                    <p>Join our community to start reading, writing, and sharing amazing content!</p>
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus"></i> Get Started
+                        </a>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Blog Posts Section -->
+        <div class="card">
+            <div class="card-header bg-white">
+                <h4 class="mb-0"><i class="bi bi-newspaper"></i> Latest Posts</h4>
+            </div>
+            <div class="card-body">
+                {% if posts %}
+                    {% for post in posts %}
+                        <article class="mb-4 pb-4 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="row">
+                                {% if post.featured_image %}
+                                <div class="col-md-4">
+                                    <img src="{{ post.featured_image.url }}" class="img-fluid rounded post-thumbnail" alt="{{ post.title }}">
+                                </div>
+                                <div class="col-md-8">
+                                {% else %}
+                                <div class="col-12">
+                                {% endif %}
+                                    <h3 class="h5 mb-2">
+                                        <a href="{% url 'blog:post_detail' post.slug %}" class="text-decoration-none text-dark">
+                                            {{ post.title }}
+                                        </a>
+                                    </h3>
+                                    
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-person"></i> {{ post.author.get_full_name|default:post.author.username }}
+                                            <i class="bi bi-calendar ms-2"></i> {{ post.published_at|date:"M d, Y" }}
+                                            <i class="bi bi-eye ms-2"></i> {{ post.views_count }} views
+                                        </small>
+                                    </div>
+
+                                    {% if post.category %}
+                                        <a href="{% url 'blog:category_detail' post.category.slug %}" class="badge bg-primary text-decoration-none">
+                                            {{ post.category.name }}
+                                        </a>
+                                    {% endif %}
+
+                                    {% for tag in post.tags.all|slice:":3" %}
+                                        <a href="{% url 'blog:tag_detail' tag.slug %}" class="badge bg-secondary text-decoration-none">
+                                            #{{ tag.name }}
+                                        </a>
+                                    {% endfor %}
+
+                                    <p class="card-text mt-2 mb-2">
+                                        {{ post.excerpt|default:post.content|truncatewords:25|striptags }}
+                                    </p>
+
+                                    <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-sm btn-outline-primary">
+                                        Read More <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'blog:post_list' %}" class="btn btn-primary">
+                            <i class="bi bi-newspaper"></i> View All Posts
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center py-5">
+                        <i class="bi bi-file-earmark-text" style="font-size: 3rem;"></i><br>
+                        No posts available yet. Check back soon!
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- User Permissions Card -->
+        {% if user.is_authenticated %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-shield-check"></i> Your Permissions</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        {% if user.is_admin %}
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Full system access
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Manage all posts
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Moderate comments
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> User management
+                            </li>
+                        {% elif user.is_author %}
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Create new posts
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Edit own posts
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Delete own posts
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Add comments
+                            </li>
+                        {% else %}
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Read all posts
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Add comments
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i> Edit own comments
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Features Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-star-fill text-warning"></i> Features</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-check2 text-primary"></i> Role-based access control
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check2 text-primary"></i> Rich text editor
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check2 text-primary"></i> Category & tag system
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check2 text-primary"></i> Comment threading
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check2 text-primary"></i> Image uploads
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check2 text-primary"></i> Responsive design
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Roles Info Card -->
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-people-fill"></i> User Roles</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="mb-1">
+                        <span class="user-badge badge-admin">Admin</span>
+                    </h6>
+                    <p class="small text-muted mb-0">Full access to all features and content management</p>
+                </div>
+                <div class="mb-3">
+                    <h6 class="mb-1">
+                        <span class="user-badge badge-author">Author</span>
+                    </h6>
+                    <p class="small text-muted mb-0">Create, edit, and manage own blog posts</p>
+                </div>
+                <div>
+                    <h6 class="mb-1">
+                        <span class="user-badge badge-reader">Reader</span>
+                    </h6>
+                    <p class="small text-muted mb-0">Read posts and participate in discussions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

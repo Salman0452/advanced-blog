@@ -185,7 +185,17 @@ cd your-blog-repo
 ```bash
 # In PythonAnywhere Bash console
 cd your-blog-repo
-mkvirtualenv --python=/usr/bin/python3.11 myblog_env
+
+# Check available Python versions first
+ls /usr/bin/python*
+
+# For free tier, use Python 3.10 (or check which version is available)
+mkvirtualenv --python=/usr/bin/python3.10 myblog_env
+
+# Upgrade pip first to avoid issues
+python -m pip install --upgrade pip
+
+# Install requirements
 pip install -r requirements.txt
 ```
 
@@ -194,7 +204,7 @@ pip install -r requirements.txt
 1. Go to Web tab in PythonAnywhere dashboard
 2. Click "Add a new web app"
 3. Choose "Manual configuration"
-4. Select Python 3.11
+4. Select Python 3.10 (or the version you used for virtualenv)
 
 #### 4. Configure WSGI File
 
